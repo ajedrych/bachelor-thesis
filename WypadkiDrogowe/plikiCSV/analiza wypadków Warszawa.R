@@ -8,6 +8,9 @@ df$DATA_ZDARZ <- as.Date(df$DATA_ZDARZ)
 
 colnames(df) <- c("data", "zdarzenia", "średnia roczna", "średnia lockdown")
 
+library("stargazer")
+stargazer(as.data.frame(df), type = "text")
+
 library(ggplot2)
 library(dplyr)
 library(plotly)
