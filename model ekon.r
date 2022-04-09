@@ -6,7 +6,7 @@ library("tidyverse")
 options(scipen = 999)
 
 #LOAD DATA
-df <- read_excel("baza_ekon.xlsx") 
+df <- read_excel("model wwa.xlsx") 
 View(df)
 
 # WARTOŚĆI BRAKUJĄCE
@@ -30,120 +30,159 @@ corrplot(kor, method="circle")
 library("stargazer")
 stargazer(as.data.frame(df), type = "text")
 
-# BIRTH RATE FOR EUROPE AND POLAND - TIME SERIES PLOT
-b.rate <- read_excel("birth-rate.xlsx")
-
-g_b_rate <- ggplot(b.rate,aes(x=year,y=birth_rate))+
-  geom_line(aes(color=country), size = 1)+
-  scale_color_manual(values = c("blue", "red")) +
-  theme_minimal()
-g_b_rate
-
-# FERTILITY RATE FOR EUROPE AND POLAND - TIME SERIES PLOT
-f.rate <- read_excel("fertility_rate.xlsx")
-
-g_f_rate <- ggplot(f.rate,aes(x=year,y=fertility_rate))+
-  geom_line(aes(color=country), size = 1)+
-  scale_color_manual(values = c("blue", "red")) +
-  theme_minimal()
-g_f_rate
 
 
 ###################################################################################
 ########################### DEPENDENT VARIABLE CHECKING ###########################
-# DEPENDENT VARIABLE - BIRTH RATE
+# DEPENDENT VARIABLE - wypadki
 
 library(rcompanion)
 par(mfrow=c(1,2))
 
-plotNormalHistogram(df1$birth_rate, prob = FALSE,
-                    main = "birth_rate and normal distribution",
+plotNormalHistogram(df1$wypadki, prob = FALSE,
+                    main = "wypadki and normal distribution",
                     linecol = "red",
                     length = 1000)
 
-df1$ln_birth_rate = log(df1$birth_rate)
+df1$ln_wypadki = log(df1$wypadki)
 
-plotNormalHistogram(df1$ln_birth_rate, prob = FALSE,
-                    main = "ln_birth_rate and normal distribution",
+plotNormalHistogram(df1$ln_wypadki, prob = FALSE,
+                    main = "ln_wypadki and normal distribution",
                     linecol = "red",
                     length = 1000)
 
 library("tseries")
-jarque.bera.test(df1$birth_rate) #p-value < 0.05, I reject H0 about normal distribution of birth_rate
-jarque.bera.test(df1$ln_birth_rate) #p-value > 0.05; no grounds for rejecting H0 about normal distribution of ln_birth_rate
+jarque.bera.test(df1$wypadki) #p-value < 0.05, I reject H0 about normal distribution of wypadki
 
-summary(df1$birth_rate)
+summary(df1$wypadki)
 
 install.packages("ggthemes")
 library("ggthemes")
 
 par(mfrow=c(1,2))
 
-boxplot_birth_rate <- ggplot( data.frame(df1$birth_rate), aes(y=df1$birth_rate)) +
+boxplot_wypadki <- ggplot( data.frame(df1$wypadki), aes(y=df1$wypadki)) +
   geom_boxplot() +
-  ggtitle("Boxplot zmiennej birth_rate") +
+  ggtitle("Boxplot zmiennej wypadki") +
   xlab("")
-boxplot_birth_rate
+boxplot_wypadki
 
-boxplot_ln_birth_rate <- ggplot( data.frame(df1$ln_birth_rate), aes(y=df1$ln_birth_rate)) +
-  geom_boxplot() +
-  ggtitle("Boxplot zmiennej ln_birth_rate") +
-  xlab("")
-boxplot_ln_birth_rate
 
 ###################################################################
 ########################### FIRST MODEL ###########################
 #MODEL 1
-model1=lm(ln_birth_rate~covid19_cases + covid19_deaths + covid19_quarantine + marriage_rate + divorce_rate +
-            budget_reve_pc + unemployment_rate + women_reproductive + femininity_ratio + avg_salary +
-            women_working + men_working + median_house_price + house_ratio + houses_area_pc +
-            avg_people_per_house + education_expenditure + health_expenditure + social_expenditure +
-            family_expenditure + children + nursery_places + doctors+ urbanisation_rate + bus_stops, data=df1)
+model1=lm(wypadki~kwarantanna + zachorowania + zgony + opady + temp + wilgotnosc + stringency_index + 
+            driving_apple + walking_apple + retail_and_recreation + grocery_and_pharmacy + 
+            parks + transit_stations + workplaces + residential, data=df1)
 summary(model1)
 
-#R^2 = 0.7671
-#adj. r^2 = 0.7506
+#R^2 = 0.6919
+#adj. r^2 = 0.6848
+# łącznie istotne
 
 library("stargazer")
 stargazer(model1, type="text", align= TRUE, style="default", df=FALSE)
 
-############################################################################################
-########################### CREATE INTERACTION BETWEEN VARIABLES ###########################
+##################################################################
+########################### RESET TEST ###########################
 
-df1$nurseryxchildren=df1$nursery_places*df1$children
-df1$education_expenditurexchildren=df1$education_expenditure*df1$children
+library("lmtest")
+library("foreign")
 
-df1$houses_area_pc_2 = df1$houses_area_pc**2
+resettest(model1, power=2:3, type="fitted")
+#p-value < 0.05
+
+resettest(model1, power=2:3, type="regressor")
+#p-value < 0.05, but the fitted version is OK
+
+
+# TEST CHOWA
+library(strucchange)
+sctest(model1, type = "Chow", point = 10)
+#p-value < 0.05
+
+########################### VARIABLES CHECKING ###########################
+# VARIABLE DRIVING_APPLE
+g_driving_apple<-ggplot(df1, aes(x=wypadki, y=driving_apple)) +geom_point(color="red")
+g_driving_apple
+
+par(mfrow=c(1,2))
+plotNormalHistogram(df1$driving_apple, prob = FALSE,
+                    main = "driving_apple and normal distribution",
+                    linecol = "red",
+                    length = 1000) 
+
+library("psych")
+describe(df1$driving_apple)
+
+library("tseries")
+jarque.bera.test(df1$driving_apple) #p-value < 0.05, I reject H0 about normal distribution
+
+df1$ln_driving_apple = log(df1$driving_apple)
+
+plotNormalHistogram(df1$ln_driving_apple, prob = FALSE,
+                    main = "ln_driving_apple and normal distribution",
+                    linecol = "red",
+                    length = 1000) 
+
+jarque.bera.test(df1$ln_driving_apple)
 
 ##################################################################
 ########################### NEXT MODEL ###########################
-#MODEL 2 - ADD INTERACTONS AND VARIABLE^2
-model2=lm(ln_birth_rate~covid19_cases + covid19_deaths + covid19_quarantine + marriage_rate + divorce_rate +
-            budget_reve_pc + unemployment_rate + women_reproductive + femininity_ratio + avg_salary +
-            women_working + men_working + median_house_price + house_ratio + houses_area_pc + houses_area_pc_2 +
-            avg_people_per_house + education_expenditure + health_expenditure + social_expenditure +
-            family_expenditure + children + nursery_places + doctors+ urbanisation_rate + bus_stops +
-            nurseryxchildren + education_expenditurexchildren, data=df1)
+#MODEL 2 - delete driving_apple
+model2=lm(wypadki~kwarantanna + zachorowania + zgony + opady + temp + wilgotnosc + stringency_index + 
+            walking_apple + retail_and_recreation + grocery_and_pharmacy + 
+            parks + transit_stations + workplaces + residential, data=df1)
 summary(model2)
 
-#R^2 = 0.7722
-#adj. r^2 = 0.754 better
+#R^2 = 0.5819
+#adj. r^2 = 0.573 
 
 stargazer(model2, type="text", align= TRUE, style="default", df=FALSE)
 
+########################### RESET TEST ###########################
+
+resettest(model2, power=2:3, type="fitted")
+#p-value < 0.05
+
+resettest(model2, power=2:3, type="regressor")
+#p-value < 0.05
+
+
+# TEST CHOWA
+library(strucchange)
+sctest(model2, type = "Chow", point = 10)
+#p-value < 0.05
+
+########################### VARIABLES CHECKING ###########################
+# VARIABLE retail and recreation
+g_retail_and_recreation<-ggplot(df1, aes(x=wypadki, y=retail_and_recreation)) +geom_point(color="red")
+g_retail_and_recreation
+
+par(mfrow=c(1,2))
+plotNormalHistogram(df1$retail_and_recreation, prob = FALSE,
+                    main = "retail_and_recreation and normal distribution",
+                    linecol = "red",
+                    length = 1000) 
+
+describe(df1$retail_and_recreation)
+
+jarque.bera.test(df1$retail_and_recreation) #p-value < 0.05, I reject H0 about normal distribution
+
 ##################################################################
 ########################### NEXT MODEL ###########################
-#MODEL 3 - LOG FOR AVG_SALARY, UNEMPLOYMENT_RATE AND MEDIAN_HOUSE_PRICE 
-model3=lm(ln_birth_rate~covid19_cases + covid19_deaths + covid19_quarantine + marriage_rate + divorce_rate +
-            budget_reve_pc + ln_unemployment_rate + women_reproductive + femininity_ratio + ln_avg_salary +
-            women_working + men_working + ln_median_house_price + house_ratio + houses_area_pc + houses_area_pc_2 +
-            avg_people_per_house + education_expenditure + health_expenditure + social_expenditure +
-            family_expenditure + children + nursery_places + doctors+ urbanisation_rate + bus_stops +
-            nurseryxchildren + education_expenditurexchildren, data=df1)
+#MODEL 3 - retail_and_recreation 
+model3=lm(wypadki~kwarantanna + zachorowania + zgony + opady + temp + wilgotnosc + stringency_index, data=df1)
 summary(model3)
 
-#R^2 = 0.7739
-#adj. r^2 = 0.7558 better
+#R^2 = 0.5205
+#adj. r^2 = 0.511 
+
+resettest(model2, power=2:3, type="fitted")
+#p-value < 0.05
+
+resettest(model2, power=2:3, type="regressor")
+#p-value < 0.05
 
 ##################################################################
 ########################### GETS ###########################
@@ -160,7 +199,7 @@ linearHypothesis(model=model3, c("covid19_quarantine=0", "avg_people_per_house=0
 ##################################################################
 ########################### NEXT MODEL ###########################
 #MODEL 4 - REMOVE COVID19_QUARANTINE, AVG_PEOPLE_PER_HOUSEAND NURSERYXCHILDREN
-model4=lm(ln_birth_rate~covid19_cases + covid19_deaths + marriage_rate + divorce_rate +
+model4=lm(ln_wypadki~driving_apple + covid19_deaths + driving_apple + divorce_rate +
             budget_reve_pc + ln_unemployment_rate + women_reproductive + femininity_ratio + ln_avg_salary +
             women_working + men_working + ln_median_house_price + house_ratio + houses_area_pc + houses_area_pc_2 +
             education_expenditure + health_expenditure + social_expenditure +
@@ -189,21 +228,21 @@ linearHypothesis(model=model4, c("women_working=0","houses_area_pc_2=0", "urbani
 #p-value = 0.5288, so variables are jointly insignificant
 
 linearHypothesis(model=model4, c("women_working=0","houses_area_pc_2=0", "urbanisation_rate=0",
-                                 "houses_area_pc=0", "budget_reve_pc=0", "covid19_cases=0"))
+                                 "houses_area_pc=0", "budget_reve_pc=0", "driving_apple=0"))
 #p-value = 0.5804, so variables are jointly insignificant
 
 linearHypothesis(model=model4, c("women_working=0","houses_area_pc_2=0", "urbanisation_rate=0",
-                                 "houses_area_pc=0", "budget_reve_pc=0", "covid19_cases=0",
+                                 "houses_area_pc=0", "budget_reve_pc=0", "driving_apple=0",
                                  "education_expenditure=0"))
 #p-value = 0.411, so variables are jointly insignificant
 
 linearHypothesis(model=model4, c("women_working=0","houses_area_pc_2=0", "urbanisation_rate=0",
-                                 "houses_area_pc=0", "budget_reve_pc=0", "covid19_cases=0",
+                                 "houses_area_pc=0", "budget_reve_pc=0", "driving_apple=0",
                                  "education_expenditure=0", "femininity_ratio=0"))
 #p-value = 0.4783, so variables are jointly insignificant
 
 linearHypothesis(model=model4, c("women_working=0","houses_area_pc_2=0", "urbanisation_rate=0",
-                                 "houses_area_pc=0", "budget_reve_pc=0", "covid19_cases=0",
+                                 "houses_area_pc=0", "budget_reve_pc=0", "driving_apple=0",
                                  "education_expenditure=0", "femininity_ratio=0", "nursery_places=0"))
 #p-value = 0.2529, so variables are jointly insignificant
 #RESZTA ZMIENNYCH MA P-VALUE MNIEJSZE OD 0.1, DLATEGO CHCE IM SIE PRZYJRZEC PRZED ICH WYRZUCENIEM
@@ -211,7 +250,7 @@ linearHypothesis(model=model4, c("women_working=0","houses_area_pc_2=0", "urbani
 ##################################################################
 ########################### NEXT MODEL ###########################
 #MODEL 5 - REMOVE VARIABLE JOINTLY INSIGNIFICANT FROM GETS
-model5=lm(ln_birth_rate~ covid19_deaths + marriage_rate + divorce_rate + ln_unemployment_rate + women_reproductive +
+model5=lm(ln_wypadki~ covid19_deaths + driving_apple + divorce_rate + ln_unemployment_rate + women_reproductive +
             ln_avg_salary + men_working + ln_median_house_price + house_ratio + health_expenditure +
             social_expenditure + family_expenditure + children + doctors + bus_stops +
             education_expenditurexchildren, data=df1)
@@ -232,7 +271,7 @@ linearHypothesis(model=model5, c("ln_avg_salary=0", "health_expenditure=0", "hou
 ##################################################################
 ########################### NEXT MODEL ###########################
 #MODEL 6 - REMOVE VARIABLE JOINTLY INSIGNIFICANT FROM GETS
-model6=lm(ln_birth_rate~ covid19_deaths + marriage_rate + divorce_rate + ln_unemployment_rate + women_reproductive +
+model6=lm(ln_wypadki~ covid19_deaths + driving_apple + divorce_rate + ln_unemployment_rate + women_reproductive +
             men_working + ln_median_house_price + house_ratio +
             social_expenditure + family_expenditure + children + doctors + bus_stops +
             education_expenditurexchildren, data=df1)
@@ -250,7 +289,7 @@ linearHypothesis(model=model6, c("house_ratio=0", "men_working=0"))
 ##################################################################
 ########################### NEXT MODEL ###########################
 #MODEL 6 - REMOVE VARIABLE JOINTLY INSIGNIFICANT FROM GETS
-model6=lm(ln_birth_rate~ covid19_deaths + marriage_rate + divorce_rate + ln_unemployment_rate + women_reproductive +
+model6=lm(ln_wypadki~ covid19_deaths + driving_apple + divorce_rate + ln_unemployment_rate + women_reproductive +
             ln_median_house_price + social_expenditure + family_expenditure + children + doctors + bus_stops +
             education_expenditurexchildren, data=df1)
 summary(model6)
@@ -261,7 +300,7 @@ summary(model6)
 ###################################################################
 ########################### FINAL MODEL ###########################
 #MODEL 7 - REMOVE interaction because of her insignificance
-model7=lm(ln_birth_rate~ covid19_deaths + marriage_rate + divorce_rate + ln_unemployment_rate + women_reproductive +
+model7=lm(ln_wypadki~ covid19_deaths + driving_apple + divorce_rate + ln_unemployment_rate + women_reproductive +
             ln_median_house_price + social_expenditure + family_expenditure + children + doctors + bus_stops, data=df1)
 summary(model7)
 
@@ -314,7 +353,7 @@ plotNormalHistogram(model7$residuals, prob = FALSE,
 # generalized least squares
 
 library("car")
-model_glm=glm(ln_birth_rate~ covid19_deaths + marriage_rate + divorce_rate + ln_unemployment_rate + women_reproductive +
+model_glm=glm(ln_wypadki~ covid19_deaths + driving_apple + divorce_rate + ln_unemployment_rate + women_reproductive +
             ln_median_house_price + social_expenditure + family_expenditure + children + doctors + bus_stops, data=df1)
 summary(model_glm)
 
@@ -322,7 +361,7 @@ summary(model_glm)
 # Weighted least sqaure (WLS)
 
 model7.weights <- 1 / lm(abs(model7$residuals) ~ model7$fitted.values)$fitted.values^2
-model7.lmw <- lm(ln_birth_rate~ covid19_deaths + marriage_rate + divorce_rate + ln_unemployment_rate + women_reproductive +
+model7.lmw <- lm(ln_wypadki~ covid19_deaths + driving_apple + divorce_rate + ln_unemployment_rate + women_reproductive +
                    ln_median_house_price + social_expenditure + family_expenditure + children + doctors + bus_stops, 
               data = df1, 
               weights = model7.weights)
@@ -377,7 +416,7 @@ lines(sqrt(cooks.distance(model7)))
 
 # SUBSET OF VARIABLES USED IN MODEL 7
 colnames(df1)
-df1_subset <- df1[,c("ln_birth_rate", "covid19_deaths", "marriage_rate", "divorce_rate",
+df1_subset <- df1[,c("ln_wypadki", "covid19_deaths", "driving_apple", "divorce_rate",
                      "ln_unemployment_rate", "women_reproductive", "ln_median_house_price",
                      "social_expenditure", "family_expenditure","children", "doctors", "bus_stops")]
 summary(df1_subset)
@@ -430,7 +469,7 @@ stargazer(model7, autocorr, type="text", df=FALSE, column.labels = c("wersja fin
 
 #MODEL BEZ OUTLIERS
 df_out <- df1[-c(19,179,345),]
-model_out=lm(ln_birth_rate~ covid19_deaths + marriage_rate + divorce_rate + ln_unemployment_rate + women_reproductive +
+model_out=lm(ln_wypadki~ covid19_deaths + driving_apple + divorce_rate + ln_unemployment_rate + women_reproductive +
             ln_median_house_price + social_expenditure + family_expenditure + children + doctors + bus_stops, data=df_out)
 summary(model_out)
 
@@ -460,27 +499,12 @@ linearHypothesis(model=model7, c("ln_median_house_price=0"))
 #######################################################################
 ########################### VARIABLES STATS ###########################
 
-########################### VARIABLES CHECKING ###########################
-# VARIABLE COVID19_CASES
-g_covid19_cases<-ggplot(df1, aes(x=birth_rate, y=covid19_cases)) +geom_point(color="red")
-g_covid19_cases
 
-par(mfrow=c(1,2))
-plotNormalHistogram(df1$covid19_cases, prob = FALSE,
-                    main = "covid19_cases and normal distribution",
-                    linecol = "red",
-                    length = 1000) 
-
-library("psych")
-describe(df1$covid19_cases)
-
-library("tseries")
-jarque.bera.test(df1$covid19_cases) #p-value < 0.05, I reject H0 about normal distribution
 
 ########################### VARIABLES CHECKING ###########################
 #VARIABLE COVID19_DEATHS
 
-g_covid19_deaths<-ggplot(df1, aes(x=birth_rate, y=covid19_deaths)) +geom_point(color="red")
+g_covid19_deaths<-ggplot(df1, aes(x=wypadki, y=covid19_deaths)) +geom_point(color="red")
 g_covid19_deaths
 
 
@@ -494,16 +518,16 @@ jarque.bera.test(df1$covid19_deaths)
 describe(df1$covid19_deaths)
 
 ########################### VARIABLES CHECKING ###########################
-#VARIABLE MARRIAGE_RATE
+#VARIABLE driving_apple
 
-plotNormalHistogram(df1$marriage_rate, prob = FALSE,
-                    main = "marriage_rate and normal distribution",
+plotNormalHistogram(df1$driving_apple, prob = FALSE,
+                    main = "driving_apple and normal distribution",
                     linecol = "red",
                     length = 1000) 
 
-describe(df1$marriage_rate)
+describe(df1$driving_apple)
 
-jarque.bera.test(df1$marriage_rate) #p-value < 0.05, I reject H0 about normal distribution
+jarque.bera.test(df1$driving_apple) #p-value < 0.05, I reject H0 about normal distribution
 
 ########################### VARIABLES CHECKING ###########################
 #VARIABLE DIVORCE_RATE
@@ -552,7 +576,7 @@ describe(df1$women_reproductive)
 ########################### VARIABLES CHECKING ###########################
 #VARIABLE AVG_SALARY
 
-g_avg_salary<-ggplot(df1, aes(x=birth_rate, y=avg_salary)) +geom_point(color="red")
+g_avg_salary<-ggplot(df1, aes(x=wypadki, y=avg_salary)) +geom_point(color="red")
 g_avg_salary
 
 par(mfrow=c(1,2))
@@ -571,7 +595,7 @@ plotNormalHistogram(df1$ln_avg_salary, prob = FALSE,
                     linecol = "red",
                     length = 1000) 
 
-g_ln_avg_salary<-ggplot(df1, aes(x=birth_rate, y=ln_avg_salary)) +geom_point(color="red")
+g_ln_avg_salary<-ggplot(df1, aes(x=wypadki, y=ln_avg_salary)) +geom_point(color="red")
 g_ln_avg_salary
 
 jarque.bera.test(df1$avg_salary) #p-value < 0.05, I reject H0 about normal distribution
@@ -633,7 +657,7 @@ plotNormalHistogram(df1$ln_women_working, prob = FALSE,
                     linecol = "red",
                     length = 1000) 
 
-g_ln_women_working<-ggplot(df1, aes(x=birth_rate, y=ln_women_working)) +geom_point(color="red")
+g_ln_women_working<-ggplot(df1, aes(x=wypadki, y=ln_women_working)) +geom_point(color="red")
 g_ln_women_working
 
 jarque.bera.test(df1$women_working) #p-value < 0.05, I reject H0 about normal distribution
@@ -654,7 +678,7 @@ plotNormalHistogram(df1$ln_covid19_quarantine, prob = FALSE,
                     linecol = "red",
                     length = 1000) 
 
-g_ln_covid19_quarantine<-ggplot(df1, aes(x=birth_rate, y=ln_covid19_quarantine)) +geom_point(color="red")
+g_ln_covid19_quarantine<-ggplot(df1, aes(x=wypadki, y=ln_covid19_quarantine)) +geom_point(color="red")
 g_ln_covid19_quarantine
 
 jarque.bera.test(df1$covid19_quarantine) #p-value < 0.05, I reject H0 about normal distribution
@@ -709,7 +733,7 @@ plotNormalHistogram(df1$ln_budget_reve_pc, prob = FALSE,
                     linecol = "red",
                     length = 1000) 
 
-g_ln_budget_reve_pc<-ggplot(df1, aes(x=birth_rate, y=ln_budget_reve_pc)) +geom_point(color="red")
+g_ln_budget_reve_pc<-ggplot(df1, aes(x=wypadki, y=ln_budget_reve_pc)) +geom_point(color="red")
 g_ln_budget_reve_pc
 
 jarque.bera.test(df1$budget_reve_pc) #p-value < 0.05, I reject H0 about normal distribution
@@ -718,7 +742,7 @@ jarque.bera.test(df1$ln_budget_reve_pc) #p-value <0.05
 ########################### VARIABLES CHECKING ###########################
 #VARIABLE FEMININITY_RATIO
 
-g_femininity_ratio<-ggplot(df1, aes(x=birth_rate, y=femininity_ratio)) +geom_point(color="red")
+g_femininity_ratio<-ggplot(df1, aes(x=wypadki, y=femininity_ratio)) +geom_point(color="red")
 g_femininity_ratio
 
 plotNormalHistogram(df1$femininity_ratio, prob = FALSE,
@@ -733,7 +757,7 @@ plotNormalHistogram(df1$ln_femininity_ratio, prob = FALSE,
                     linecol = "red",
                     length = 1000) 
 
-g_ln_femininity_ratio<-ggplot(df1, aes(x=birth_rate, y=ln_femininity_ratio)) +geom_point(color="red")
+g_ln_femininity_ratio<-ggplot(df1, aes(x=wypadki, y=ln_femininity_ratio)) +geom_point(color="red")
 g_ln_femininity_ratio
 
 jarque.bera.test(df1$femininity_ratio) #p-value < 0.05, I reject H0 about normal distribution
@@ -787,7 +811,7 @@ plotNormalHistogram(df1$ln_children, prob = FALSE,
 
 jarque.bera.test(df1$urbanisation_rate) #p-value < 0.05, but p-value is higher than in the next case
 
-g_urbanisation_rate<-ggplot(df1, aes(x=birth_rate, y=urbanisation_rate)) +geom_point(color="red")
+g_urbanisation_rate<-ggplot(df1, aes(x=wypadki, y=urbanisation_rate)) +geom_point(color="red")
 g_urbanisation_rate
 
 plotNormalHistogram(df1$urbanisation_rate, prob = FALSE,
