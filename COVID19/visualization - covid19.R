@@ -40,6 +40,7 @@ ggplot(data = kontynenty21, mapping = aes(x = data, y = nowe_przypadki, colour =
 
 polska <- read_excel("polska-covid.xlsx")
 polska_pierwsza <- read_excel("polska-covid-pierwsza-fala.xlsx") #pierwsza fala
+polska_szczep <- read_excel("szczepienia polska.xlsx")
 
 ########## zachorowania pierwsza fala i stringency index #########
 
@@ -118,4 +119,13 @@ ggplot(data = polska, mapping = aes(x = data)) +
   theme_minimal()+
   theme(legend.title = element_blank())+
   ylab("Liczba zachorowań na COVID-19")+
+  xlab("")
+
+############ szczepienia polska ############
+
+ggplot(data = polska_szczep, mapping = aes(x = data)) +
+  geom_line(aes(y = szczepionki), size=1, linetype = 1)+
+  theme_minimal()+
+  theme(legend.title = element_blank())+
+  ylab("Liczba osób zaszczepionych na COVID-19")+
   xlab("")
