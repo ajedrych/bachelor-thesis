@@ -38,17 +38,8 @@ ggplot(data = kontynenty21, mapping = aes(x = data, y = nowe_przypadki, colour =
 ###################################################
 ######### COVID-19 polska #####################
 
-polska <- read_excel("polska_covid19.xlsx")
+polska <- read_excel("polska-covid.xlsx")
 polska_pierwsza <- read_excel("polska-covid-pierwsza-fala.xlsx") #pierwsza fala
-
-######### zachorowania ############################
-
-ggplot(data = polska, mapping = aes(x = data, y = zachorowania)) +
-  geom_line(size=1)+
-  theme_minimal()+
-  theme(legend.title = element_blank())+
-  ylab("Liczba zachorowań na COVID-19")+
-  xlab("")
 
 ########## zachorowania pierwsza fala i stringency index #########
 
@@ -68,21 +59,63 @@ ggplot(polska_pierwsza, aes(x=data)) +
   xlab("")
 
 
-######### zachorowania skumulowane ################
+########## zachorowania 2020-2021 i stringency index #########
 
-ggplot(data = polska, mapping = aes(x = data, y = zachorowania_cumulated)) +
-  geom_line(size=1)+
+scaleFactor <- max(polska$zachorowania) / max(polska$stringency_index)
+
+ggplot(polska, aes(x=data)) +
+  geom_line( aes(y=zachorowania), size=1, linetype = 1) + 
+  geom_line( aes(y=stringency_index* scaleFactor), size=1, linetype = 2, colour = "#F8766D") +
+  scale_y_continuous(
+    name = "Liczba zachorowań na COVID-19
+    ",
+    # Add a second axis and specify its features
+    sec.axis = sec_axis(~ . /scaleFactor, name="COVID-19 Stringency Index
+                        "))+ 
+  theme_minimal()+
+  theme(legend.title = element_blank())+
+  xlab("")
+
+########## zgony 2020-2021 i stringency index #########
+
+scaleFactor_zgony <- max(polska$zgony) / max(polska$stringency_index)
+
+ggplot(polska, aes(x=data)) +
+  geom_line( aes(y=zgony), size=1, linetype = 1) + 
+  geom_line( aes(y=stringency_index* scaleFactor_zgony), size=1, linetype = 2, colour = "#F8766D") +
+  scale_y_continuous(
+    name = "Liczba zgonów spowodowanych COVID-19
+    ",
+    # Add a second axis and specify its features
+    sec.axis = sec_axis(~ . /scaleFactor_zgony, name="COVID-19 Stringency Index
+                        "))+ 
+  theme_minimal()+
+  theme(legend.title = element_blank())+
+  xlab("")
+
+########## zachorowania i zgony 2020-2021 #########
+
+scaleFactor1 <- max(polska$zachorowania) / max(polska$zgony)
+
+ggplot(polska, aes(x=data)) +
+  geom_line( aes(y=zachorowania), size=1) + 
+  geom_line( aes(y=zgony* scaleFactor1), size=0.5, colour = "#F8766D") +
+  scale_y_continuous(
+    name = "Liczba zachorowań na COVID-19
+    ",
+    # Add a second axis and specify its features
+    sec.axis = sec_axis(~ . /scaleFactor1, name="Liczba zgonów spowodowanych COVID-19
+                        "))+ 
+  theme_minimal()+
+  theme(legend.title = element_blank())+
+  xlab("")
+
+########## zachorowania i srednia kroczaca #########
+
+ggplot(data = polska, mapping = aes(x = data)) +
+  geom_line(aes(y = zachorowania), size=0.5, linetype = 1)+
+  geom_line(aes(y=srednia), size=1, linetype = 2, colour = "#F8766D" )+
   theme_minimal()+
   theme(legend.title = element_blank())+
   ylab("Liczba zachorowań na COVID-19")+
-  xlab("")
-
-
-######### zgony skumulowane  #####################
-
-ggplot(data = polska, mapping = aes(x = data, y = zgony)) +
-  geom_line(size=1)+
-  theme_minimal()+
-  theme(legend.title = element_blank())+
-  ylab("Liczba zgonów spowodowaych COVID-19")+
   xlab("")
