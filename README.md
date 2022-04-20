@@ -1,2 +1,2 @@
 # bachelor-thesis
-Analiza wpływu pandemii COVID-19 na liczbę wypadków i kolizji drogowych w Warszawie
+Analiza wpływu pandemii COVID-19 na liczbę zdarzeń drogowych w Warszawie
