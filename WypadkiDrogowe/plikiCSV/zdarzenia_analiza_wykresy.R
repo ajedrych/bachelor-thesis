@@ -16,6 +16,7 @@ aggregate(zdarzenia~week(data), data = wwa2019, sum)
 aggregate(zdarzenia~week(data), data = wwa2020, sum)
 
 wwa <- read_excel("wykres_2018_20_warszawa_zdarzenia.xlsx")
+
 ###############################
 # 2018, 2019 i 2020 na jednym wykresie zdarzenia drogowe
 
@@ -36,3 +37,18 @@ month <- seq(as.Date("2020-01-01"),
 month_numeric <- as.numeric(format(month, format = "%U"))
 month_label <- format(month, format = "%b")
 
+############################################################
+#zmiana 2020 do 2019 wypadki, kolizje, smierc, ranni warszawa
+
+zmiana <- read_excel("wykres_zmiana2019_20_warszawa.xlsx")
+
+level_order <- factor(zmiana$miesiąc, level = c('sty', 'lut', 'mar', 'kwi', 'maj', 'cze',
+                                                'lip', 'sie', 'wrz', 'paź', 'lis', 'gru'))
+
+ggplot(zmiana, aes(fill=legenda, y=zmiana, x=level_order)) + 
+  geom_bar(position="dodge", stat="identity")+
+  scale_y_continuous(labels = scales::percent)+
+  theme_minimal()+
+  theme(legend.title = element_blank())+
+  ylab("")+
+  xlab("")
