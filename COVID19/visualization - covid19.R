@@ -59,7 +59,8 @@ ggplot(polska_pierwsza, aes(x = data)) +
        ",
        colour = "")+
   theme_minimal()+
-  theme(legend.title = element_blank())
+  theme(legend.title = element_blank())+
+  xlab("")
 
 
 ########## zachorowania 2020-2021 i stringency index #########
@@ -76,7 +77,8 @@ ggplot(polska, aes(x = data)) +
        ",
        colour = "")+
   theme_minimal()+
-  theme(legend.title = element_blank())
+  theme(legend.title = element_blank())+
+  xlab("")
 
 
 ########## zgony 2020-2021 i stringency index #########
@@ -93,7 +95,8 @@ ggplot(polska, aes(x = data)) +
        ",
        colour = "")+
   theme_minimal()+
-  theme(legend.title = element_blank())
+  theme(legend.title = element_blank())+
+  xlab("")
 
 ########## zachorowania i zgony 2020-2021 #########
 
@@ -109,7 +112,8 @@ ggplot(polska, aes(x = data)) +
        ",
        colour = "")+
   theme_minimal()+
-  theme(legend.title = element_blank())
+  theme(legend.title = element_blank())+
+  xlab("")
 
 ############ szczepienia polska ############
 
@@ -120,3 +124,25 @@ ggplot(data = polska_szczep, mapping = aes(x = data)) +
   ylab("Zaszczepieni
        ")+
   xlab("")
+
+#################################################################
+################### COVID-19 WARSZAWA PIERWSZA FALA #############
+
+wwa_pierwsza <- read_excel("covid19_WWA_pierwszafala.xlsx")
+
+
+scaleFactor_wwa <- max(wwa_pierwsza$ill_cumulated) / max(wwa_pierwsza$death_cumulated)
+
+ggplot(wwa_pierwsza, aes(x = date)) +
+  geom_line(aes(y = ill_cumulated, colour = "zachorowania"), size=1) + 
+  geom_line(aes(y = death_cumulated * scaleFactor_wwa, colour = "zgony"), size=1) +
+  scale_y_continuous(sec.axis = sec_axis(~ . /scaleFactor_wwa, name="Zgony
+                                         "))+ 
+  scale_colour_manual(values = c("black", "#F8766D"))+
+  labs(y = "Zachorowania
+       ",
+       colour = "")+
+  theme_minimal()+
+  theme(legend.title = element_blank())+
+  xlab("")
+
