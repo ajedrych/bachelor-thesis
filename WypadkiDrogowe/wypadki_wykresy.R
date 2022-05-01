@@ -16,7 +16,7 @@ ggplot(data = polska2000, mapping = aes(x = rok)) +
   geom_line(aes(y = wypadki), size=1, linetype = 1)+
   theme_minimal()+
   theme(legend.title = element_blank())+
-  ylab("Liczba wypadków komunikacyjnych w Polsce
+  ylab("Wypadki komunikacyjne
        ")+
   xlab("")
 
@@ -35,7 +35,8 @@ ggplot(polska2000, aes(x = rok))+
        ",
        colour = "")+
   theme_minimal()+
-  theme(legend.title = element_blank())
+  theme(legend.title = element_blank())+
+  xlab("")
 
 
 

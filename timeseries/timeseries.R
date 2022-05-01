@@ -153,3 +153,27 @@ holiday <-
 holiday
 
 stargazer(holiday, summary = FALSE)
+
+
+install.packages("ggseas")
+library(ggseas)
+
+# SEATS with defaults
+ggplot(wwa, aes(x = DATA_ZDARZ, y = ID)) +
+  geom_line(colour = "grey80") +
+  stat_seas() +
+  ggtitle("SEATS seasonal adjustment - international airline passengers") +
+  ylab("International airline passengers per month")
+
+ggplot(wwa, aes(x = DATA_ZDARZ, y = ID)) +
+  geom_line(colour = "grey80") +
+  stat_seas(x13_params = list(x11 = "", outlier = NULL)) +
+  ggtitle("X11 seasonal adjustment - international airline passengers") +
+  ylab("International airline passengers per month")
+
+ggplot(wwa, aes(x = DATA_ZDARZ, y = ID)) +
+  geom_line(colour = "grey80") +
+  stat_decomp(type = "multiplicative")
+
+ggsdc(wwa, aes(x = DATA_ZDARZ, y = ID), method = "decompose") +
+  geom_line()
