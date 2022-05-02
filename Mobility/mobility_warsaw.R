@@ -57,11 +57,19 @@ ggplot(wwa_apple_w, aes(x = data)) +
   xlab("")
 
 
+library(stargazer)
+summary(wwa_apple)
+
+
 ######## GOOGLE MOBILITY TRENDS ###############
 
-wwa_google <- read_excel("warszawa_google_2020_week.xlsx")
+wwa_google <- read_excel("warszawa_google_2020.xlsx")
 
-ggplot(wwa_google, aes(x = date)) +
+summary(wwa_google)
+
+wwa_google_w <- read_excel("warszawa_google_2020_week.xlsx")
+
+ggplot(wwa_google_w, aes(x = date)) +
   geom_line(aes(y = retail_and_recreation, colour = "handel i rekreacja"), size=1) +
   geom_line(aes(y= grocery_and_pharmacy, colour = "sklepy spożywcze i apteki"), size = 1) +
   geom_line(aes(y= parks, colour = "parki"), size = 1) +
@@ -78,4 +86,15 @@ ggplot(wwa_google, aes(x = date)) +
 
 
 
+############### KORELACJA ####################
 
+df <- read_excel("warszawa_analiza_korelacja.xlsx")
+df1 <- df[ -c(1) ]
+
+# CORRELATION PLOT
+library(corrplot)
+kor<-cor(df1)
+corrplot(kor, method="circle")
+
+library("stargazer")
+stargazer(as.data.frame(df), type = "text", digits = 1)
