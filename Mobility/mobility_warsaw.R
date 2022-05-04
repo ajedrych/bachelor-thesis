@@ -46,8 +46,8 @@ ggplot(wwa_apple, aes(x = data)) +
 wwa_apple_w <- read_excel("warszawa_apple_2020_week.xlsx")
 
 ggplot(wwa_apple_w, aes(x = data)) +
-  geom_line(aes(y = driving, colour = "samochód"), size=1) +
-  geom_line(aes(y= walking, colour = "spacer"), size = 1) +
+  geom_line(aes(y = driving, colour = "driving"), size=1) +
+  geom_line(aes(y= walking, colour = "walking"), size = 1) +
   geom_hline(yintercept=100)+
   labs(y = "Zmiana
        ",
@@ -70,12 +70,12 @@ summary(wwa_google)
 wwa_google_w <- read_excel("warszawa_google_2020_week.xlsx")
 
 ggplot(wwa_google_w, aes(x = date)) +
-  geom_line(aes(y = retail_and_recreation, colour = "handel i rekreacja"), size=1) +
-  geom_line(aes(y= grocery_and_pharmacy, colour = "sklepy spożywcze i apteki"), size = 1) +
-  geom_line(aes(y= parks, colour = "parki"), size = 1) +
-  geom_line(aes(y= transit, colour = "stacje i przystanki"), size = 1) +
-  geom_line(aes(y= workplaces, colour = "miejsca pracy"), size = 1) +
-  geom_line(aes(y= residential, colour = "miejsca zamieszkania"), size = 1) +
+  geom_line(aes(y = retail_and_recreation, colour = "retail_recreation"), size=1) +
+  geom_line(aes(y= grocery_and_pharmacy, colour = "food_pharmacy"), size = 1) +
+  geom_line(aes(y= parks, colour = "parks"), size = 1) +
+  geom_line(aes(y= transit, colour = "transit"), size = 1) +
+  geom_line(aes(y= workplaces, colour = "workplace"), size = 1) +
+  geom_line(aes(y= residential, colour = "home"), size = 1) +
   geom_hline(yintercept=100)+
   labs(y = "Zmiana
        ",
@@ -91,10 +91,37 @@ ggplot(wwa_google_w, aes(x = date)) +
 df <- read_excel("warszawa_analiza_korelacja.xlsx")
 df1 <- df[ -c(1) ]
 
+#korelacja czastkowa
+library(ppcor)
+czast <- pcor(na.omit(df1), method = c("pearson"))
+corrplot(czast$estimate, method =  "circle")
+
+#korelacja pearsona
+library(psych)
+pears <- corr.test(x = na.omit(df1), use = "pairwise", method = "pearson")
+corrplot(pears$r, method = "circle")
+
+#korelacja speramana
+spear <- corr.test(x = na.omit(df1), use = "pairwise", method = "spearman")
+corrplot(spear$r, method = "circle")
+
 # CORRELATION PLOT
 library(corrplot)
 kor<-cor(df1)
-corrplot(kor, method="circle")
+corrplot(kor, method="circle") 
+        
 
 library("stargazer")
 stargazer(as.data.frame(df), type = "text", digits = 1)
+
+
+#manova
+
+man <- manova(cbind(driving, walking, retail_recreation, food_pharmacy, parks, transit, workplaces, home)~new_cases+new_deaths+stringency_index, data= df1)
+summary(man)
+
+man1 <- manova(cbind(retail_recreation, food_pharmacy, parks, transit, workplaces, home)~new_cases+new_deaths+stringency_index, data= df1)
+summary(man1)
+
+man2 <- manova(cbind(retail_recreation, food_pharmacy, parks, transit, workplaces)~new_cases+new_deaths+stringency_index, data= df1)
+summary(man2)
