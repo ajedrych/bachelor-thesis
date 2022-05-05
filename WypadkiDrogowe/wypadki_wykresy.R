@@ -89,7 +89,7 @@ options(scipen = 999)
 library(rcompanion)
 par(mfrow=c(1,2))
 
-
+############ dni tyg
 ggplot(df18_19, aes(x= level_order1, y=ID))+
   geom_boxplot()+
   theme_minimal()+
@@ -103,5 +103,40 @@ ggplot(df20, aes(x= level_order2, y=ID))+
   theme_minimal()+
   theme(legend.title = element_blank())+
   ylab("Zdarzenia w 2020 roku
+       ")+
+  xlab("")
+
+
+
+# miesiace
+df18_19 %>%
+  mutate(month = format(month, format = "%m")) %>%
+  ggplot(aes(x = month, y = ID)) +
+  geom_boxplot() +
+  theme_minimal()+
+  theme(legend.title = element_blank())+
+  ylab("Zdarzenia w latach 2018-2019
+       ")+
+  xlab("
+       Miesiąc")
+
+df20 %>%
+  mutate(month = format(month, format = "%m")) %>%
+  ggplot(aes(x = month, y = ID)) +
+  geom_boxplot() +
+  theme_minimal()+
+  theme(legend.title = element_blank())+
+  ylab("Zdarzenia w 2020 roku
+       ")+
+  xlab("
+       Miesiąc")
+
+#rok
+
+ggplot(wwa, aes(x= year, y=ID))+
+  geom_boxplot()+
+  theme_minimal()+
+  theme(legend.title = element_blank())+
+  ylab("Zdarzenia
        ")+
   xlab("")
