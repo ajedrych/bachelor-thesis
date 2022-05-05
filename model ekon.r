@@ -6,8 +6,35 @@ library("tidyverse")
 options(scipen = 999)
 
 #LOAD DATA
-df <- read_excel("model wwa.xlsx") 
+df <- read_excel("model.xlsx") 
 View(df)
+
+model1=lm(traffic_incidents~quarantine+new_cases+new_deaths+rainfall+temperature+humidity+stringency_index+driving+walking+fuel, data=df)
+summary(model1)
+
+
+library("lmtest")
+library("foreign")
+
+resettest(model3, power=2, type="fitted")
+#p-value < 0.05
+
+resettest(model1, power=2, type="regressor")
+#p-value < 0.05, but the fitted version is OK
+
+model2=lm(traffic_incidents~quarantine+new_cases+new_deaths+rainfall+temperature+stringency_index+driving+walking+fuel, data=df)
+summary(model2)
+
+model3=lm(traffic_incidents~quarantine+new_cases+new_deaths+temperature+stringency_index+driving+walking+fuel, data=df)
+summary(model3)
+
+
+
+# TEST CHOWA
+library(strucchange)
+sctest(model1, type = "Chow", point = 10)
+#p-value < 0.05
+
 
 # WARTOŚĆI BRAKUJĄCE
 sapply(df, function(x) sum(is.na(x)))
@@ -39,20 +66,20 @@ stargazer(as.data.frame(df), type = "text")
 library(rcompanion)
 par(mfrow=c(1,2))
 
-plotNormalHistogram(df1$wypadki, prob = FALSE,
+plotNormalHistogram(df$traffic_incidents, prob = FALSE,
                     main = "wypadki and normal distribution",
                     linecol = "red",
                     length = 1000)
 
-df1$ln_wypadki = log(df1$wypadki)
+df$ln_traffic_incidents = log(df$traffic_incidents)
 
-plotNormalHistogram(df1$ln_wypadki, prob = FALSE,
+plotNormalHistogram(df$ln_traffic_incidents, prob = FALSE,
                     main = "ln_wypadki and normal distribution",
                     linecol = "red",
                     length = 1000)
 
 library("tseries")
-jarque.bera.test(df1$wypadki) #p-value < 0.05, I reject H0 about normal distribution of wypadki
+jarque.bera.test(df$f traffic_incidents) #p-value < 0.05, I reject H0 about normal distribution of wypadki
 
 summary(df1$wypadki)
 
