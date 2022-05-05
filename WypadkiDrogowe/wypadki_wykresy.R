@@ -49,3 +49,59 @@ ggplot(data = warszawa2010, mapping = aes(x = Date)) +
   ylab("Liczba wypadków komunikacyjnych w Warszawie
        ")+
   xlab("")
+
+
+
+
+############# podstawowe staty
+
+df <- read_excel("wykresy.xlsx")
+library("stargazer")
+stargazer(as.data.frame(df), type = "text", digits = 1)
+
+#################### boxploty
+
+wwa <- read_excel("wykresy_warszawa_2018_21.xlsx")
+
+wwa <-
+  wwa %>%
+  mutate(date = as.Date(DATA_ZDARZ)) %>%
+  group_by(date) %>%
+  mutate(weekday= weekdays(date),
+         month =  format(date, "%m"),
+         year = format(date, "%Y"))
+
+level_order <- factor(wwa$weekday, level = c("poniedziałek", "wtorek", "środa",
+                                             "czwartek", "piątek", "sobota", "niedziela"))
+
+level_order1 <- factor(df18_19$weekday, level = c("poniedziałek", "wtorek", "środa",
+                                             "czwartek", "piątek", "sobota", "niedziela"))
+
+level_order2 <- factor(df20$weekday, level = c("poniedziałek", "wtorek", "środa",
+                                             "czwartek", "piątek", "sobota", "niedziela"))
+
+
+df18_19 <- wwa[wwa$date >= "2018-01-01" & wwa$date <= "2019-12-31", ]
+df20 <- wwa[wwa$date >= "2020-01-01" & wwa$date <= "2020-12-31", ]
+
+
+options(scipen = 999)
+library(rcompanion)
+par(mfrow=c(1,2))
+
+
+ggplot(df18_19, aes(x= level_order1, y=ID))+
+  geom_boxplot()+
+  theme_minimal()+
+  theme(legend.title = element_blank())+
+  ylab("Zdarzenia w latach 2018-2019
+       ")+
+  xlab("")
+
+ggplot(df20, aes(x= level_order2, y=ID))+
+  geom_boxplot()+
+  theme_minimal()+
+  theme(legend.title = element_blank())+
+  ylab("Zdarzenia w 2020 roku
+       ")+
+  xlab("")

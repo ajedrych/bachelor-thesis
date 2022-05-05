@@ -101,15 +101,37 @@ library(psych)
 pears <- corr.test(x = na.omit(df1), use = "pairwise", method = "pearson")
 corrplot(pears$r, method = "circle")
 
+stargazer(pears$r, type = "text")
+
 #korelacja speramana
 spear <- corr.test(x = na.omit(df1), use = "pairwise", method = "spearman")
 corrplot(spear$r, method = "circle")
+
+stargazer(spear$r, type = "text")
+
+
+library(rcompanion)
+par(mfrow=c(1,2))
+corrplot(pears$r, method = "circle", title = "\n\n\nKorelacja Pearsona")
+corrplot(spear$r, method = "circle", title = "\n\n\nKorelacja Spearmana")
+
 
 # CORRELATION PLOT
 library(corrplot)
 kor<-cor(df1)
 corrplot(kor, method="circle") 
         
+shapiro.test(df1$driving) # p< 0.05 - rozklad nie jest r. normalnym
+shapiro.test(df1$walking) # p< 0.05 - rozklad nie jest r. normalnym
+shapiro.test(df1$retail_recreation) # p< 0.05 - rozklad nie jest r. normalnym
+shapiro.test(df1$food_pharmacy) # p< 0.05 - rozklad nie jest r. normalnym
+shapiro.test(df1$parks) # p >0.05 - rozkład normalny
+shapiro.test(df1$transit) # p< 0.05 - rozklad nie jest r. normalnym
+shapiro.test(df1$workplaces) # p< 0.05 - rozklad nie jest r. normalnym
+shapiro.test(df1$home) # p< 0.05 - rozklad nie jest r. normalnym
+shapiro.test(df1$new_cases) # p< 0.05 - rozklad nie jest r. normalnym
+shapiro.test(df1$new_deaths) # p< 0.05 - rozklad nie jest r. normalnym
+shapiro.test(df1$stringency_index) # p< 0.05 - rozklad nie jest r. normalnym
 
 library("stargazer")
 stargazer(as.data.frame(df), type = "text", digits = 1)

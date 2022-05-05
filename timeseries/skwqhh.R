@@ -115,3 +115,15 @@ daily_adjusted_sa <-
            feb29 = "sfac"
   )
 daily_adjusted_sa$reg$aicc
+
+
+
+
+warszawa <- read_excel("warszawa_miesieczne_zdarzenia_2018_21.xlsx")
+
+library(xts)
+warszawa.xts <- xts(warszawa[, c("value")], order.by = warszawa$date)
+
+library(forecast)
+auto.model <- auto.arima(warszawa.xts)
+auto.model
