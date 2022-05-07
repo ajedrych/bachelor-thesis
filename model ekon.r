@@ -147,6 +147,11 @@ summary(autocorr)
 stargazer(model1, model6, model_glm, model6.lmw, autocorr, type="text", align= TRUE, style="default", df=TRUE, column.labels = c("MNK_first", "MNK_final", "SUMNK", "WMNK", "estymator Neweya-Westa"))
 
 
+#WSPÓŁLINIOWOŚĆ
+# jesli VIF > 10, to zmienna objasniajaca jest współliniowa
+vif(model6.lmw)
+
+
 ################################### DEAD AND INJURED INCIDENTS ###############################
 #MODEL 1
 model_d_1=lm(dead_injured_incidents ~ quarantine + new_cases + new_deaths+rainfall + temperature + humidity + stringency_index+
