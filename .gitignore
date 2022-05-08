@@ -3,22 +3,10 @@
 *.xsd
 *.xml
 *.xlsx
-danehistorycznepowiaty (2).zip
-Meteorologia/opis.txt
-Meteorologia/desktop.ini
-Kalendarium wydarzeń związanych z pandemią COVID.docx
-~$chelor.docx
-~$lendarium wydarzeń związanych z pandemią COVID.docx
-bachelor.docx
-WypadkiDrogowe/~$ownik SEWiK.docx
-COVID19/danehistorycznepowiaty.zip
-WypadkiDrogowe/~$ownik SEWiK.docx
-COVID19/readme.txt
-*.docx
-*.docx
-WypadkiDrogowe/~$ownik SEWiK.docx
+*.zip
+*.txt
+*.ini
 *.docx
 *.tmp
-WypadkiDrogowe/Słownik SEWiK.docx
-Model OLS - traffic incidents/.Rhistory
-Model OLS - traffic incidents/.RData
+*.Rhistory
+*.RData
