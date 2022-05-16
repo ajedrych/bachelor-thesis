@@ -10,23 +10,30 @@ kontynenty21 <- read_excel("kontynenty nowe przypadki.xlsx")
 
 ######### zachorowania skumulowane 2020 ################
 
-ggplot(data = kontynenty, mapping = aes(x = miesiąc, y = zachorowania, colour = kontynent)) +
+library(rcompanion)
+par(mfrow=c(1,2))
+
+zacho <- ggplot(data = kontynenty, mapping = aes(x = miesiąc, y = zachorowania, colour = kontynent)) +
   geom_line(size=1)+
   theme_minimal()+
-  theme(legend.title = element_blank())+
+  theme(legend.position = "none")+
   ylab("Zachorowania
        ")+
   xlab("")
 
 ######### zgony skumulowane 2020 #######################
 
-ggplot(data = kontynenty, mapping = aes(x = miesiąc, y = zgony, colour = kontynent)) +
+zgon <- ggplot(data = kontynenty, mapping = aes(x = miesiąc, y = zgony, colour = kontynent)) +
   geom_line(size=1)+
   theme_minimal()+
   theme(legend.title = element_blank())+
   ylab("Zgony
        ")+
   xlab("")
+
+require(gridExtra)
+
+grid.arrange(zacho, zgon, ncol=2)
 
 ######### nowe przypadki 2021 #######################
 

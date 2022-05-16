@@ -32,8 +32,8 @@ ggplot(wwa_apple, aes(x = data)) +
   xlab("")
 
 ggplot(wwa_apple, aes(x = data)) +
-  geom_line(aes(y = driving, colour = "samochód"), size=1) +
-  geom_line(aes(y= walking, colour = "spacer"), size = 1) +
+  geom_line(aes(y = driving, colour = "driving"), size=1) +
+  geom_line(aes(y= walking, colour = "walking"), size = 1) +
   geom_hline(yintercept=100)+
   scale_colour_manual(values = c("#F8766D", "#7CAE00"))+
   labs(y = "Zmiana
@@ -69,7 +69,7 @@ summary(wwa_google)
 
 wwa_google_w <- read_excel("warszawa_google_2020_week.xlsx")
 
-ggplot(wwa_google_w, aes(x = date)) +
+ggplot(wwa_google, aes(x = date)) +
   geom_line(aes(y = retail_and_recreation, colour = "retail_recreation"), size=1) +
   geom_line(aes(y= grocery_and_pharmacy, colour = "food_pharmacy"), size = 1) +
   geom_line(aes(y= parks, colour = "parks"), size = 1) +
