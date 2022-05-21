@@ -105,6 +105,8 @@ library("tseries")
 jarque.bera.test(model6.lmw$residuals)
 #p-value = 0.4487 > 0.05; OK
 
+library(rcompanion)
+par(mfrow=c(1,2))
 
 d<-density(model6.lmw$residuals)
 plot(d,main='Residual KDE Plot',xlab='Residual value')
