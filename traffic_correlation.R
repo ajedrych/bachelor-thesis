@@ -14,11 +14,12 @@ library(corrplot)
 library(psych)
 
 df <- read_excel("model_2020.xlsx")
-df_t <- subset(df, select = c("traffic_incidents","quarantine", "new_cases", "new_deaths", "stringency_index", "pandemic"))
-df_d <- subset(df, select = c("dead_injured_incidents","quarantine", "new_cases", "new_deaths", "stringency_index", "pandemic" ))
-df_f <- subset(df, select = c("foreigners_incidents","quarantine", "new_cases", "new_deaths", "stringency_index", "pandemic" ))
-df_b <- subset(df, select = c("bike_pedestrian_incidents","quarantine", "new_cases", "new_deaths", "stringency_index", "pandemic" ))
-df_a <- subset(df, select = c("alcohol_incidents","quarantine", "new_cases", "new_deaths", "stringency_index", "pandemic" ))
+df1 <- subset(df, select = c("traffic_incidents","driving", "walking", "retail_recreation", "food_pharmacy", "parks", "transit", "workplaces", "home"))
+df_t <- subset(df, select = c("traffic_incidents","quarantine", "new_cases", "new_deaths", "stringency_index"))
+df_d <- subset(df, select = c("dead_injured_incidents","quarantine", "new_cases", "new_deaths", "stringency_index" ))
+df_f <- subset(df, select = c("foreigners_incidents","quarantine", "new_cases", "new_deaths", "stringency_index" ))
+df_b <- subset(df, select = c("bike_pedestrian_incidents","quarantine", "new_cases", "new_deaths", "stringency_index" ))
+df_a <- subset(df, select = c("alcohol_incidents","quarantine", "new_cases", "new_deaths", "stringency_index" ))
 
 shapiro.test(df$traffic_incidents) # p< 0.05 - rozklad nie jest r. normalnym
 shapiro.test(df$dead_injured_incidents) # p< 0.05 - rozklad nie jest r. normalnym
@@ -30,6 +31,16 @@ shapiro.test(df$new_cases) # p< 0.05 - rozklad nie jest r. normalnym
 shapiro.test(df$new_deaths) # p< 0.05 - rozklad nie jest r. normalnym
 shapiro.test(df$stringency_index) # p< 0.05 - rozklad nie jest r. normalnym
 shapiro.test(df$pandemic) # p< 0.05 - rozklad nie jest r. normalnym
+
+#################### mobilność #######################
+
+#korelacja pearsona
+pears1 <- corr.test(x = na.omit(df1), use = "pairwise", method = "pearson")
+corrplot(pears1$r, method = "number")
+
+#korelacja speramana
+spear1 <- corr.test(x = na.omit(df1), use = "pairwise", method = "spearman")
+corrplot(spear1$r, method = "number")
 
 ################## traffic incidents ###################
 
