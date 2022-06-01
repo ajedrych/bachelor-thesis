@@ -20,6 +20,7 @@ df_d <- subset(df, select = c("dead_injured_incidents","quarantine", "new_cases"
 df_f <- subset(df, select = c("foreigners_incidents","quarantine", "new_cases", "new_deaths", "stringency_index" ))
 df_b <- subset(df, select = c("bike_pedestrian_incidents","quarantine", "new_cases", "new_deaths", "stringency_index" ))
 df_a <- subset(df, select = c("alcohol_incidents","quarantine", "new_cases", "new_deaths", "stringency_index" ))
+df2 <- subset(df, select = c("dead_injured_incidents","foreigners_incidents", "bike_pedestrian_incidents", "alcohol_incidents","quarantine", "new_cases", "new_deaths", "stringency_index"))
 
 shapiro.test(df$traffic_incidents) # p< 0.05 - rozklad nie jest r. normalnym
 shapiro.test(df$dead_injured_incidents) # p< 0.05 - rozklad nie jest r. normalnym
@@ -52,6 +53,9 @@ corrplot(pears_t$r, method = "number")
 spear_t <- corr.test(x = na.omit(df_t), use = "pairwise", method = "spearman")
 corrplot(spear_t$r, method = "number")
 
+
+library(rcompanion)
+par(mfrow=c(2,2))
 ################## dead and injured incidents ###################
 
 #korelacja pearsona
@@ -60,7 +64,7 @@ corrplot(pears_d$r, method = "number")
 
 #korelacja speramana
 spear_d <- corr.test(x = na.omit(df_d), use = "pairwise", method = "spearman")
-corrplot(spear_d$r, method = "number")
+corrplot(spear_d$r, method = "circle")
 
 ################## foreigners incidents ###################
 
@@ -70,7 +74,7 @@ corrplot(pears_f$r, method = "number")
 
 #korelacja speramana
 spear_f <- corr.test(x = na.omit(df_f), use = "pairwise", method = "spearman")
-corrplot(spear_f$r, method = "number")
+corrplot(spear_f$r, method = "circle", title = "foreigners")
 
 ################## bike and pedestrian incidents ###################
 
@@ -80,7 +84,7 @@ corrplot(pears_b$r, method = "number")
 
 #korelacja speramana
 spear_b <- corr.test(x = na.omit(df_b), use = "pairwise", method = "spearman")
-corrplot(spear_b$r, method = "number")
+corrplot(spear_b$r, method = "circle")
 
 ################## alcohol incidents ###################
 
@@ -90,10 +94,16 @@ corrplot(pears_a$r, method = "number")
 
 #korelacja speramana
 spear_a <- corr.test(x = na.omit(df_a), use = "pairwise", method = "spearman")
-corrplot(spear_a$r, method = "number")
+corrplot(spear_a$r, method = "circle")
 
 
+# all
 
+par(mfrow = c(1,1))
+
+#korelacja speramana
+spear2 <- corr.test(x = na.omit(df2), use = "pairwise", method = "spearman")
+corrplot(spear2$r, method = "circle")
 
 
 
