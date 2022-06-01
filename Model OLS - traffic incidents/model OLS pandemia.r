@@ -6,7 +6,7 @@ library("tidyverse")
 options(scipen = 999)
 
 #LOAD DATA
-df <- read_excel("model_2020.xlsx") 
+df <- read_excel("model_pandemia.xlsx") 
 View(df)
 
 library(Hmisc)
@@ -18,52 +18,52 @@ library("foreign")
 ################################### ALL TRAFFIC INCIDENTS ###############################
 #MODEL 1
 model1=lm(traffic_incidents ~ quarantine + new_cases + new_deaths+rainfall + temperature + humidity + stringency_index+
-            driving + walking + fuel + pandemic + weekend_free, data = df)
+            driving + walking + fuel + weekend_free, data = df)
 summary(model1)
 
 resettest(model1, power=2:3, type="fitted")
 
-#MODEL 2 - USUWAM TEMPERATURE
-model2=lm(traffic_incidents ~ quarantine + new_cases + new_deaths + rainfall + humidity + stringency_index+
-            driving + walking + fuel + pandemic + weekend_free, data = df)
+#MODEL 2 - USUWAM rainfall
+model2=lm(traffic_incidents ~ quarantine + new_cases + new_deaths+temperature + humidity + stringency_index+
+            driving + walking + fuel + weekend_free, data = df)
 summary(model2)
 
 resettest(model2, power=2:3, type="fitted")
 
 #MODEL 3 - USUWAM QUARANTINE
-model3=lm(traffic_incidents ~ new_cases + new_deaths + rainfall + humidity + stringency_index+
-            driving + walking + fuel + pandemic + weekend_free, data = df)
+model3=lm(traffic_incidents ~ new_cases + new_deaths+temperature + humidity + stringency_index+
+            driving + walking + fuel + weekend_free, data = df)
 summary(model3)
 
 resettest(model3, power=2:3, type="fitted")
 
-#MODEL 4 - USUWAM RAINFALL
-model4=lm(traffic_incidents ~ new_cases + new_deaths + humidity + stringency_index+
-            driving + walking + fuel + pandemic + weekend_free, data = df)
+#MODEL 4 - USUWAM temperature
+model4=lm(traffic_incidents ~ new_cases + new_deaths+humidity + stringency_index+
+            driving + walking + fuel + weekend_free, data = df)
 summary(model4)
 
 resettest(model4, power=2:3, type="fitted")
 
 #MODEL 5 - USUWAM walking
-model5=lm(traffic_incidents ~ new_cases + new_deaths + humidity + stringency_index+
-            driving + fuel + pandemic + weekend_free, data = df)
+model5=lm(traffic_incidents ~ new_cases + new_deaths+humidity + stringency_index+
+            driving + fuel + weekend_free, data = df)
 summary(model5)
 
 resettest(model5, power=2:3, type="fitted")
 
 #MODEL 6 - USUWAM fuel
-model6=lm(traffic_incidents ~ new_cases + new_deaths + humidity + stringency_index+
-            driving + pandemic + weekend_free, data = df)
+model6=lm(traffic_incidents ~ new_cases + new_deaths+humidity + stringency_index+
+            driving + weekend_free, data = df)
 summary(model6)
 
 resettest(model6, power=2:3, type="fitted")
 
 library("car")
-linearHypothesis(model=model1, c("temperature", "quarantine", "rainfall", "walking", "fuel" ))
-# p-value = 0.991 >0.05 - zmienne są łącznie nieistotne statystycznie
+linearHypothesis(model=model1, c("rainfall", "quarantine", "temperature", "walking", "fuel" ))
+# p-value = 0.889 >0.05 - zmienne są łącznie nieistotne statystycznie
 
 library(strucchange)
-sctest(model6, type = "Chow", point = 10)
+sctest(model6, type = "Chow", point = 10) #p-value > 0,4515 => ok
 
 library(stargazer)
 stargazer(model1, model6, type="text", align= TRUE, style="default", df=TRUE, column.labels = c("wersja początkowa", "wersja finalna"))
