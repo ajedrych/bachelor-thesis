@@ -17,4 +17,6 @@ ggplot(prawa, aes(x = data)) +
        colour = "")+
   theme_minimal()+
   theme(legend.title = element_blank())+
-  xlab("")
+  xlab("")+
+  geom_vline(xintercept  = as.POSIXct(as.Date("2020-04-01")), linetype=2)
+
