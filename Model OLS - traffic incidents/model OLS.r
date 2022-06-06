@@ -152,6 +152,7 @@ stargazer(model1, model6, model_glm, model6.lmw, autocorr, type="html", align= T
 
 #WSPÓŁLINIOWOŚĆ
 # jesli VIF > 10, to zmienna objasniajaca jest współliniowa
+library(car)
 vif(model6.lmw)
 
 
