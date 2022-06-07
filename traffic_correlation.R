@@ -41,7 +41,7 @@ corrplot(pears1$r, method = "number")
 
 #korelacja speramana
 spear1 <- corr.test(x = na.omit(df1), use = "pairwise", method = "spearman")
-corrplot(spear1$r, method = "number")
+corrplot(spear1$r, method = "circle")
 
 ################## traffic incidents ###################
 
@@ -51,7 +51,7 @@ corrplot(pears_t$r, method = "number")
 
 #korelacja speramana
 spear_t <- corr.test(x = na.omit(df_t), use = "pairwise", method = "spearman")
-corrplot(spear_t$r, method = "number")
+corrplot(spear_t$r, method = "circle")
 
 
 library(rcompanion)
