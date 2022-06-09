@@ -8,6 +8,6 @@ Data cleansing, creating smaller databases was created using Jupyter Notebooks. 
 
 #### Project
 
-The paper was written as an bachelor's thesis
+The project was created for an bachelor's thesis.
 
 *Faculty of Economic Sciences, University of Warsaw, June 2022* 
